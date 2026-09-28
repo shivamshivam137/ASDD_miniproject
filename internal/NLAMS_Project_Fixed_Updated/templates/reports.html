@@ -1,0 +1,10 @@
+
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>Reports & MIS</h1><p>Generate operational reports and export clean CSV datasets for analysis.</p></div></div>
+<div class="grid3">
+{% for title,kind,desc in [('Project Progress Report','projects','Project, land, stage, progress and risk'),('Compensation Report','compensation','Assessment, approval and disbursement'),('R&R Report','rr','Family, benefits and completion'),('Grievance Report','grievance','Citizen issues and resolution status')] %}
+<div class="card"><h3>{{title}}</h3><p class="mini">{{desc}}</p><a class="btn" href="/reports/export/{{kind}}">↓ Export CSV</a> <button class="btn secondary" onclick="window.print()">Print</button></div>
+{% endfor %}
+</div>
+<div class="card" style="margin-top:16px"><h3>Report Filters</h3><div class="formgrid"><div class="field"><label>Project</label><select class="select"><option>All Projects</option><option>NLAMS-2026-001 — NH-44 Expansion</option><option>NLAMS-2026-002 — Western DFC</option></select></div><div class="field"><label>Date Range</label><input class="input" type="date"></div><div class="field"><label>Status</label><select class="select"><option>All Statuses</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></div><div class="field"><label>District</label><input class="input" placeholder="All districts"></div></div></div>
+{% endblock %}

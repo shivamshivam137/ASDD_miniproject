@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block title %}GIS Parcel Verification{% endblock %}{% block content %}
+<div class="toolbar"><div><h2>GIS Parcel Verification</h2><p>Locate, inspect and validate the parcel linked to a revenue case.</p><button type="button" class="primary gisopen" onclick="trackRevenueLocation()">⌖ Track Current Location</button></div>
+<form class="filters" method="get"><select name="case_id" onchange="this.form.submit()">{% for c in cases %}<option value="{{c.case_id}}" {% if case and c.case_id==case.case_id %}selected{% endif %}>{{c.case_id}} — Survey {{c.survey_no}}</option>{% endfor %}</select></form></div>
+{% if case %}<div class="gisgrid"><div class="panel"><div class="panelhead"><div><h3>Interactive Parcel View</h3><p>{{case.village}}, {{case.taluka}}, {{case.district}} • Survey No. {{case.survey_no}}</p></div><span class="maptag">PARCEL SELECTED</span></div>
+<div id="revenueMap" class="bigmap real-leaflet-map"></div></div>
+<div class="panel"><div class="panelhead"><div><h3>Parcel Details</h3><p>Revenue record linked to the selected geometry.</p></div></div><div class="info"><span>Parcel ID</span><b>GIS-{{case.district[:3]|upper}}-{{case.survey_no|replace('/','-')}}</b><span>Survey No.</span><b>{{case.survey_no}}</b><span>Area</span><b>{{case.area}} ha</b><span>Owner</span><b>{{case.revenue_owner}}</b><span>Land Type</span><b>{{case.land_type}}</b><span>Location</span><b>{{case.village}}, {{case.taluka}}</b><span>Encumbrance</span><b>{{case.encumbrance}}</b></div><a class="primary gisopen" href="{{url_for('case_detail',case_id=case.case_id)}}">Open Full Case →</a></div></div>{% endif %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let revenueMap=null, parcelMarker=null, liveMarker=null, accuracyCircle=null, liveWatch=null;
+const parcelLat={{ (case.lat or 18.5667)|tojson }}, parcelLng={{ (case.lng or 73.9925)|tojson }};
+function initRevenueMap(){
+  revenueMap=L.map('revenueMap',{zoomControl:true}).setView([parcelLat,parcelLng],16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,attribution:'&copy; OpenStreetMap contributors'}).addTo(revenueMap);
+  parcelMarker=L.marker([parcelLat,parcelLng]).addTo(revenueMap).bindPopup('<b>Selected Parcel</b><br>Survey No. {{case.survey_no|e}}<br>{{case.area}} ha').openPopup();
+  L.circle([parcelLat,parcelLng],{radius:120,weight:1,fillOpacity:.08}).addTo(revenueMap);
+  loadNLAMSLocations();
+}
+async function loadNLAMSLocations(){
+  try{const ls=await (await fetch('http://127.0.0.1:8090/api/locations',{cache:'no-store'})).json();
+    ls.filter(x=>x.actor_role==='revenue_officer').slice(0,20).forEach(x=>addLiveMarker(x));
+  }catch(e){}
+}
+function addLiveMarker(x){
+  if(!revenueMap||!x.lat||!x.lng)return;
+  const m=L.circleMarker([Number(x.lat),Number(x.lng)],{radius:8,weight:3,fillOpacity:.85}).addTo(revenueMap);
+  m.bindPopup('<b>Live Revenue Officer Location</b><br>'+Number(x.lat).toFixed(6)+', '+Number(x.lng).toFixed(6)+'<br>Accuracy ±'+Math.round(x.accuracy||0)+' m');
+}
+function updateLive(x){
+  const ll=[x.coords.latitude,x.coords.longitude];
+  if(!liveMarker) liveMarker=L.marker(ll).addTo(revenueMap).bindPopup('Live device location'); else liveMarker.setLatLng(ll);
+  if(!accuracyCircle) accuracyCircle=L.circle(ll,{radius:x.coords.accuracy||10,weight:1,fillOpacity:.1}).addTo(revenueMap); else accuracyCircle.setLatLng(ll).setRadius(x.coords.accuracy||10);
+  liveMarker.bindPopup('<b>Live device location</b><br>'+ll[0].toFixed(6)+', '+ll[1].toFixed(6)+'<br>Accuracy ±'+Math.round(x.coords.accuracy||0)+' m');
+  revenueMap.setView(ll,Math.max(revenueMap.getZoom(),16));
+  fetch('http://127.0.0.1:8090/api/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor_role:'revenue_officer',actor_name:'Revenue Officer',project_id:'{{case.project|e}}',parcel_id:'GIS-{{case.district[:3]|upper}}-{{case.survey_no|replace('/','-')}}',lat:x.coords.latitude,lng:x.coords.longitude,accuracy:x.coords.accuracy,captured_at:new Date().toISOString(),source:'browser-geolocation'})}).catch(()=>{});
+}
+function trackRevenueLocation(){
+ if(!navigator.geolocation){alert('Browser GPS is not supported.');return;}
+ if(liveWatch!==null) navigator.geolocation.clearWatch(liveWatch);
+ liveWatch=navigator.geolocation.watchPosition(updateLive,err=>alert(err.code===1?'Allow location permission to track the device.':'Unable to read GPS location.'),{enableHighAccuracy:true,timeout:15000,maximumAge:3000});
+ alert('Live location tracking started. The marker will update as the device moves.');
+}
+const revenueLocationTimer=setInterval(loadNLAMSLocations,5000);window.addEventListener('beforeunload',()=>{clearInterval(revenueLocationTimer);if(liveWatch!==null)navigator.geolocation.clearWatch(liveWatch)});
+initRevenueMap();
+</script>
+{% endblock %}

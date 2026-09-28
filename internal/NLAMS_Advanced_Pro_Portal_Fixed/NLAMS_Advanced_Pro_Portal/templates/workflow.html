@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Smart Workflow{% endblock %}{% block content %}
+<div class="titlebar"><div><h1>Smart Workflow Recommendation</h1><p>Configure stages, SLA and view a case timeline.</p></div><button class="btn primary" onclick="openStep()">＋ Add Workflow Step</button></div>
+<div class="cols"><section class="panel"><div id="steps" class="timeline"></div></section><section class="panel"><div class="ph"><h3>Complete Case Timeline</h3><span>NLAMS-PUN-021</span></div><div class="timeline compact" id="caseTimeline"></div></section></div>
+{% endblock %}{% block scripts %}<script>
+let workflowSteps=[];
+async function loadWorkflow(){
+  try{
+    workflowSteps=await api('/api/workflow');
+    const stepsEl=document.getElementById('steps');
+    const timelineEl=document.getElementById('caseTimeline');
+    stepsEl.innerHTML=workflowSteps.map(s=>`<div class="trow"><i></i><div><b>${esc(s.step_order)}. ${esc(s.name)}</b><small>Owner: ${esc(s.owner_role)} · SLA ${esc(s.sla_days)} days</small></div>${status(s.status)}<button class="link-btn" onclick="openStep(${s.id})">Edit</button><button class="danger" onclick="delStep(${s.id})">×</button></div>`).join('');
+    timelineEl.innerHTML=workflowSteps.map((s,i)=>`<div class="trow"><i class="${i>4?'orange':''}"></i><div><b>${esc(s.name)}</b><small>${i<4?'Completed':'Pending'} · ${esc(s.sla_days)} day SLA · ${esc(s.owner_role)}</small></div></div>`).join('');
+  }catch(e){toast('Unable to load workflow configuration','error')}
+}
+function openStep(id=null){
+  const s=id?workflowSteps.find(x=>x.id===id):{};
+  modal(`<h2>${id?'Edit':'Add'} Workflow Step</h2><form id="workflowForm" class="form"><label>Order<input name="step_order" value="${s.step_order||workflowSteps.length+1}" type="number" min="1" required></label><label>Name<input name="name" value="${esc(s.name||'')}" required></label><label>Owner Role<input name="owner_role" value="${esc(s.owner_role||'Administrator')}" required></label><label>SLA Days<input name="sla_days" value="${s.sla_days||3}" type="number" min="1" required></label><label>Status<select name="status"><option ${s.status==='Active'||!s.status?'selected':''}>Active</option><option ${s.status==='Inactive'?'selected':''}>Inactive</option></select></label><div class="modal-actions"><button type="button" class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form>`);
+  document.getElementById('workflowForm').onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));try{if(id)await api('/api/workflow/'+id,'PUT',d);else await api('/api/workflow','POST',d);closeModal();await loadWorkflow();toast(id?'Workflow step updated':'Workflow step added','success')}catch(err){}};
+}
+async function delStep(id){if(!confirm('Delete this workflow step?'))return;try{await api('/api/workflow/'+id,'DELETE');await loadWorkflow();toast('Workflow step deleted','success')}catch(e){}}
+loadWorkflow();
+</script>{% endblock %}

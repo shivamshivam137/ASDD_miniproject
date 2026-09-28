@@ -1,0 +1,29 @@
+
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}NLAMS Project Agency{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"></head>
+<body data-nlams-role="project_agency"><div class="app">
+<div class="sidebar">
+  <div class="brand">🇮🇳 NLAMS <small>National Land Acquisition & Management System</small></div>
+  <div class="nav">
+    <a href="/" class="{{ 'active' if request.path=='/' else '' }}"><span class="ico">⌂</span> Dashboard</a>
+    <a href="/projects/new"><span class="ico">＋</span> Create New Project</a>
+    <a href="/projects"><span class="ico">▤</span> My Projects</a>
+    <a href="/land"><span class="ico">⌖</span> Land Requirement / GIS</a>
+    <a href="/documents"><span class="ico">▧</span> Documents</a>
+    <a href="/compensation"><span class="ico">₹</span> Compensation</a>
+    <a href="/rr"><span class="ico">👥</span> R&R Management</a>
+    <a href="/grievance"><span class="ico">💬</span> Grievance</a>
+    <a href="/landowner-verification"><span class="ico">🛡️</span> Landowner Verification</a>
+    <a href="/reports"><span class="ico">▥</span> Reports & MIS</a>
+    <a href="/ai-risk"><span class="ico">✦</span> AI Risk Analysis</a>
+    <a href="/notifications"><span class="ico">🔔</span> Notifications</a>
+  </div>
+</div>
+<div class="topbar">
+  <div><div class="top-title">Project Agency Portal</div><div class="mini">Transparent · Efficient · Digital</div></div>
+  <div class="user"><span>🔔 <b>{{ notifications_count if notifications_count else 3 }}</b></span><div class="avatar">PA</div><div><b>Vrushali Ghatage</b><div class="mini">Project Officer · Maharashtra</div></div></div>
+</div>
+<main class="main"><div class="content">
+{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div id="flash" class="toast">{{messages[-1][1]}}</div>{% endif %}{% endwith %}
+{% block content %}{% endblock %}</div><div class="footer">NLAMS v2.0 Demo · Project Agency Portal · Synthetic demonstration dataset</div></main></div>
+<script src="{{ url_for('static',filename='app.js') }}"></script>{% block scripts %}{% endblock %}<script src="/static/integration.js"></script></body></html>

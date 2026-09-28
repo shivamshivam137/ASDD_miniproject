@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>NLAMS — Grievance Officer</title><link rel="stylesheet" href="/static/style.css"></head>
+<body data-nlams-role="grievance_officer">
+<header class="topbar"><div class="brand"><div class="brandmark">NL</div><div><b>NLAMS</b><small>National Land Acquisition & Management System</small></div></div><div class="crumb">Grievance Management</div><div class="top-actions"><span class="role">District Administration</span><span class="user-dot">AD</span><span>{{ officer_name }}</span><a class="logout" href="/logout">Logout</a></div></header>
+<div class="layout">
+<aside class="sidebar">
+  <div class="side-title">GRIEVANCE OFFICER</div>
+  <button class="nav active" onclick="page('home',this)">▣ <span>Command Center</span></button>
+  <button class="nav" onclick="page('queue',this)">☷ <span>All Grievances</span><em id="navCount">8</em></button>
+  <button class="nav" onclick="page('triage',this)">✦ <span>Smart AI Triage</span></button>
+  <button class="nav" onclick="page('verify',this)">▤ <span>Document Verification</span></button>
+  <button class="nav" onclick="page('duplicates',this)">⤢ <span>Duplicate Detection</span></button>
+  <button class="nav" onclick="page('report',this)">✓ <span>Verification Report</span></button>
+  <button class="nav" onclick="page('analytics',this)">▥ <span>MIS / Analytics</span></button>
+  <div class="side-bottom"><div class="mini-profile"><span class="avatar">AD</span><div><b>{{ officer_name }}</b><small>Grievance Officer</small></div></div><a href="/logout">Sign out</a></div>
+</aside>
+<main class="main">
+<section id="home">
+  <div class="page-head"><div><div class="eyebrow">NLAMS / GRIEVANCE MANAGEMENT</div><h1>Grievance Command Center</h1><p>Monitor every citizen grievance, affected landowner, project and resolution deadline from one place.</p></div><a class="primary-btn" href="#" onclick="page('queue',document.querySelectorAll('.nav')[1]);return false;">View All Landowner Grievances →</a></div>
+  <div class="cards" id="stats"></div>
+  <div class="grid-2"><div class="panel"><div class="panel-head"><div><h2>Priority Grievances</h2><span class="muted">Highest attention required</span></div><button class="text-btn" onclick="page('queue',document.querySelectorAll('.nav')[1])">View all</button></div><div id="homeq"></div></div>
+  <div class="panel"><div class="panel-head"><div><h2>Project-wise Grievances</h2><span class="muted">Live registered complaints</span></div></div><div id="projectStats"></div></div></div>
+</section>
+<section id="queue" class="hide">
+  <div class="page-head"><div><div class="eyebrow">GRIEVANCE MANAGEMENT</div><h1>All Landowner Grievances</h1><p>View every complaint submitted by affected landowners, grouped with project and parcel information.</p></div></div>
+  <div class="panel"><div class="toolbar"><input id="searchBox" class="search" placeholder="Search grievance ID, landowner, project, survey number…" oninput="renderQueue()"><select id="statusFilter" onchange="renderQueue()"><option value="">All Statuses</option><option>Open</option><option>Assigned</option><option>Under Verification</option><option>Under Review</option><option>Action Taken</option><option>Resolved</option><option>Escalated</option></select><select id="categoryFilter" onchange="renderQueue()"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Grievance ID</th><th>Landowner</th><th>Project</th><th>Survey / Gat</th><th>Category</th><th>Priority</th><th>Status</th><th>SLA Due</th><th>Action</th></tr></thead><tbody id="q"></tbody></table></div></div>
+</section>
+<section id="triage" class="hide"><div class="page-head"><div><div class="eyebrow">AI ASSISTED WORKFLOW</div><h1>Smart Grievance Triage</h1><p>Classify complaint type and priority before assigning it to the responsible authority.</p></div></div><div class="panel narrow"><textarea id="triageText" placeholder="Paste citizen grievance description…"></textarea><button class="primary-btn" onclick="runTriage()">Classify + Prioritize</button><div id="triageOut"></div></div></section>
+<section id="verify" class="hide"><div class="page-head"><div><div class="eyebrow">DOCUMENT INTELLIGENCE</div><h1>AI Document Verification</h1><p>Check whether extracted evidence contains key land-acquisition fields.</p></div></div><div class="panel narrow"><textarea id="doc" placeholder="Paste OCR / extracted document text…"></textarea><button class="primary-btn" onclick="runDocumentVerification()">Verify Document</button><div id="vo"></div></div></section>
+<section id="duplicates" class="hide"><div class="page-head"><div><div class="eyebrow">QUALITY CONTROL</div><h1>Duplicate Grievance Detection</h1><p>Find multiple tickets raised by the same landowner for the same parcel.</p></div></div><div class="panel narrow"><div class="form-grid"><label>Landowner<input id="owner" placeholder="e.g. Ramesh Patil"></label><label>Survey / Gat<input id="survey" placeholder="e.g. GAT-142/3"></label></div><button class="primary-btn" onclick="findDuplicates()">Find Similar Grievances</button><div id="du"></div></div></section>
+<section id="report" class="hide"><div class="page-head"><div><div class="eyebrow">OFFICER DISPOSAL</div><h1>One-Click Verification Report</h1><p>Create an audit-ready findings and recommendation record.</p></div></div><div class="panel narrow"><input id="rt" placeholder="Grievance ID"><textarea id="find" placeholder="Officer findings…"></textarea><textarea id="rec" placeholder="Recommendation / next action…"></textarea><button class="primary-btn" onclick="generateVerificationReport()">Generate Verification Report</button><div id="ro"></div></div></section>
+<section id="analytics" class="hide"><div class="page-head"><div><div class="eyebrow">EXECUTIVE MONITORING</div><h1>MIS / Analytics</h1><p>Quick view of project and category concentration for grievance monitoring.</p></div></div><div class="grid-2"><div class="panel"><h2>Project-wise</h2><div id="analyticsProjects"></div></div><div class="panel"><h2>Category-wise</h2><div id="analyticsCategories"></div></div></div></section>
+</main></div>
+<script src="/static/app.js"></script><script src="/static/integration.js"></script></body></html>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>Grievance Management</h1><p>Register, link and resolve grievances against the same Project → Parcel → Landowner record.</p></div></div>
+<div class="card">
+<h3>🤖 AI Document Guide</h3>
+<p class="mini">Describe the problem in your own words. NLAMS suggests the relevant supporting documents so the citizen does not have to guess.</p>
+<div class="formgrid">
+<div class="field"><label>Grievance category</label><select id="aiCategory" class="select"><option>Grievance</option><option>Compensation</option><option>R&R</option><option>Land Record</option><option>Boundary</option><option>Survey</option><option>Notification</option><option>Hearing</option></select></div>
+<div class="field full"><label>Describe the problem</label><textarea id="aiText" class="input" rows="4" placeholder="Example: My compensation has not been received and I did not get my award copy."></textarea></div>
+<div class="field full"><button type="button" class="btn" onclick="suggestDocs()">✨ Suggest required documents</button></div>
+</div><div id="aiResult" style="margin-top:12px"></div>
+</div>
+<div class="card"><h3>Register Grievance</h3><form method="post" action="/grievance/add" class="formgrid">
+<div class="field"><label>Project</label><select name="project_id" id="projectSelect" class="select" onchange="loadParcels()">{% for p in projects %}<option value="{{p.project_id}}">{{p.project_id}} — {{p.name}}</option>{% endfor %}</select></div>
+<div class="field"><label>Parcel</label><select name="parcel_id" id="parcelSelect" class="select"></select></div>
+<div class="field"><label>Citizen / Landowner</label><input class="input" name="citizen" required placeholder="Demo Owner A"></div>
+<div class="field"><label>Category</label><select name="category" class="select"><option>Compensation</option><option>R&R</option><option>Land Record</option><option>Boundary</option><option>Survey</option><option>Notification</option><option>Hearing</option><option>Other</option></select></div>
+<div class="field"><label>Priority</label><select name="priority" class="select"><option>Medium</option><option>High</option><option>Low</option></select></div>
+<div class="field full"><label>Description</label><textarea class="input" name="description" required rows="3"></textarea></div>
+<div class="field full"><button class="btn">Register Linked Grievance</button></div></form></div>
+<div class="card"><h3>Grievance Register</h3><div class="table-wrap"><table class="table"><thead><tr><th>ID</th><th>Citizen</th><th>Project</th><th>Parcel</th><th>Category</th><th>Description</th><th>Priority</th><th>Status</th><th>Updated</th></tr></thead><tbody>
+{% for g in rows %}<tr><td><b>{{g.grievance_id}}</b></td><td>{{g.citizen}}</td><td>{{g.project_name}}</td><td>{{g.parcel_id or '—'}}</td><td>{{g.category}}</td><td style="white-space:normal;max-width:300px">{{g.description}}</td><td>{{g.priority}}</td><td>{{g.status}}</td><td>{{g.updated_at}}</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}{% block scripts %}<script>
+async function loadParcels(){const pid=document.getElementById('projectSelect').value;const r=await fetch('/api/parcels?project_id='+encodeURIComponent(pid));const rows=await r.json();document.getElementById('parcelSelect').innerHTML=rows.map(x=>`<option value="${x.parcel_id}">${x.parcel_id} — Survey ${x.survey_no} — ${x.owner}</option>`).join('');}
+async function suggestDocs(){const text=document.getElementById('aiText').value;const category=document.getElementById('aiCategory').value;const r=await fetch('/api/ai/document-guide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,category})});const x=await r.json();document.getElementById('aiResult').innerHTML=`<div class="alert info"><b>Suggested category: ${x.category}</b><br>${x.explanation}<ul>${x.documents.map(d=>`<li>📄 ${d}</li>`).join('')}</ul></div>`;}
+loadParcels();
+</script>{% endblock %}

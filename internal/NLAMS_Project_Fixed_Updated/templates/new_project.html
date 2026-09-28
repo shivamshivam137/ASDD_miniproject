@@ -1,0 +1,19 @@
+
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>Create New Project</h1><p>Step 1 of the digital acquisition lifecycle. Project ID is generated automatically.</p></div></div>
+<div class="card"><form method="post" class="formgrid">
+<div class="field"><label>Project Name *</label><input class="input" name="name" required placeholder="e.g. Coastal Highway Expansion"></div>
+<div class="field"><label>Project Type *</label><select class="select" name="ptype"><option>Highway</option><option>Railway</option><option>Road</option><option>Renewable Energy</option><option>Industrial Corridor</option></select></div>
+<div class="field"><label>Department / Ministry *</label><input class="input" name="department" required placeholder="Government department"></div>
+<div class="field"><label>State *</label><select class="select" name="state"><option>Maharashtra</option><option>Gujarat</option><option>Madhya Pradesh</option><option>Rajasthan</option><option>Karnataka</option></select></div>
+<div class="field"><label>District *</label><input class="input" name="district" required></div>
+<div class="field"><label>Taluka *</label><input class="input" name="taluka" required></div>
+<div class="field"><label>Villages *</label><input class="input" name="villages" required placeholder="Comma-separated villages"></div>
+<div class="field"><label>Estimated Project Cost (₹ Cr) *</label><input class="input" name="cost_cr" type="number" min="0" step=".1" required></div>
+<div class="field"><label>Expected Duration (months) *</label><input class="input" name="duration" type="number" min="1" required></div>
+<div class="field"><label>Required Land Area (Ha) *</label><input class="input" name="land_required" type="number" min="0" step=".01" required></div>
+<div class="field full"><label>Project Description</label><textarea name="description" rows="4" placeholder="Purpose, scope, alignment and key milestones"></textarea></div>
+<div class="field full"><div class="alert info">✓ On save, NLAMS creates a unique Project ID, records an audit event and opens the project workspace for land parcel selection, documents and submission.</div></div>
+<div class="field full"><button class="btn" type="submit">Create Project & Continue →</button> <a class="btn secondary" href="/projects">Cancel</a></div>
+</form></div>
+{% endblock %}

@@ -1,0 +1,6 @@
+project_id,project_name,state,district,land_required_ha,land_acquired_ha,stage,progress,risk
+NLAMS-2026-001,NH-44 Expansion,Maharashtra,Pune,450,380,Land Notification,45,78
+NLAMS-2026-002,Western DFC,Gujarat,Surat,320,110,Under Review,30,54
+NLAMS-2026-003,PM GatiShakti Corridor,Maharashtra,Raigad,280,210,Notification Issued,60,38
+NLAMS-2026-004,Solar Park Development,Madhya Pradesh,Rewa,150,32,Planning,20,22
+NLAMS-2026-005,Delhi-Mumbai Expressway,Maharashtra,Nashik,620,510,Land Acquisition,75,61

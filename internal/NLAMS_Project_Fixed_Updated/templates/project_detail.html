@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>{{p.name}}</h1><p>{{p.project_id}} · {{p.department}} · {{p.district}}, {{p.state}}</p></div><a class="btn secondary" href="/projects">← All Projects</a></div>
+<div class="grid6">
+<div class="stat"><div class="label">Land Required</div><div class="value">{{p.land_required}} Ha</div></div><div class="stat"><div class="label">Land Acquired</div><div class="value">{{p.land_acquired}} Ha</div></div><div class="stat"><div class="label">Progress</div><div class="value">{{p.progress}}%</div></div><div class="stat"><div class="label">Project Cost</div><div class="value">₹{{p.cost_cr}} Cr</div></div><div class="stat"><div class="label">Risk</div><div class="value">{{p.risk}}%</div></div><div class="stat"><div class="label">Duration</div><div class="value">{{p.duration_months}} mo</div></div></div>
+<div class="card" style="margin-top:16px"><h3>Lifecycle Workflow</h3><div class="workflow">{% for s in ['Project Created','Land Requirement','Documents','Submission','Verification','Notification','Objection/Hearing','Compensation','R&R','Possession','Field Verification','Closure'] %}<div class="step {% if loop.index0 < 5 and p.progress>=20 %}done{% elif s==p.stage %}active{% endif %}"><div class="dot">{% if loop.index0 < 5 and p.progress>=20 %}✓{% else %}{{loop.index}}{% endif %}</div><b style="font-size:10px">{{s}}</b></div>{% endfor %}</div>
+<form method="post" action="/project/{{p.project_id}}/stage" class="formgrid" style="margin-top:16px"><div class="field"><label>Update Stage</label><select class="select" name="stage">{% for s in ['Draft','Submitted for Verification','Verification','Land Notification','Objection / Hearing','Compensation','R&R','Possession','Field Verification','Acquisition Closed'] %}<option {% if p.stage==s %}selected{% endif %}>{{s}}</option>{% endfor %}</select></div><div class="field"><label>Progress %</label><input class="input" name="progress" type="number" min="0" max="100" value="{{p.progress}}"></div><div class="field full"><button class="btn">Save Workflow Update</button></div></form></div>
+<div class="grid2">
+<div class="card"><h3>Land Parcels</h3><table class="table"><thead><tr><th>Survey</th><th>Village</th><th>Area</th><th>Owner</th><th>Status</th></tr></thead><tbody>{% for x in parcels %}<tr><td>{{x.survey_no}}</td><td>{{x.village}}</td><td>{{x.area}}</td><td>{{x.owner}}</td><td>{{x.status}}</td></tr>{% endfor %}</tbody></table></div>
+<div class="card"><h3>Audit Trail</h3><div class="timeline">{% for a in audit %}<div class="event"><b>{{a.action}}</b><small>{{a.actor}} · {{a.created_at}}</small></div>{% endfor %}</div></div>
+</div>
+<div class="grid3" style="margin-top:16px">
+<div class="card"><h3>Documents ({{docs|length}})</h3>{% for d in docs %}<div class="alert {% if d.status=='Verified' %}success{% else %}warning{% endif %}">📄 {{d.name}} · {{d.status}}</div>{% endfor %}<a class="btn secondary" href="/documents">Manage Documents</a></div>
+<div class="card"><h3>Compensation</h3>{% for c in comp %}<div class="alert info">{{c.family_id}} · {{c.status}} · ₹{{c.disbursed}} Cr disbursed</div>{% endfor %}<a class="btn secondary" href="/compensation">Open Module</a></div>
+<div class="card"><h3>R&R & Grievance</h3><div class="alert info">{{rr|length}} R&R family records</div><div class="alert warning">{{gr|length}} grievance records</div><a class="btn secondary" href="/rr">Open R&R</a> <a class="btn secondary" href="/grievance">Grievances</a></div>
+</div>
+{% endblock %}

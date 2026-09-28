@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>Document Management</h1><p>Upload documents and monitor their verification status. Actions are handled by the Admin.</p></div><button class="btn" onclick="openModal('docModal')">＋ Upload Document</button></div>
+<div class="card"><div class="alert info">After upload, this section is read-only for this role. You can view the current document status; verification or other actions are performed by the Admin.</div>
+<div class="table-wrap"><table class="table"><thead><tr><th>Document</th><th>Project</th><th>Type</th><th>Action Status</th><th>Uploaded</th><th>View</th></tr></thead><tbody>
+{% for d in docs %}<tr><td><b>📄 {{d.name}}</b></td><td>{{d.project_name}}</td><td>{{d.dtype}}</td>
+<td><span class="badge {% if d.status=='Verified' %}green{% elif d.status=='Pending Validation' %}orange{% else %}blue{% endif %}">{{d.status}}</span></td>
+<td>{{d.uploaded_at}}</td><td><button type="button" class="btn" onclick="viewDocument('{{d.name|e}}','{{d.project_name|e}}','{{d.dtype|e}}','{{d.status|e}}','{{d.uploaded_at|e}}')">View Status</button></td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="modal" id="docViewModal" onclick="if(event.target===this)closeModal('docViewModal')"><div class="modalbox"><h3>Document Status</h3><div class="formgrid">
+<div class="field"><label>Document</label><div id="vDocName" class="input"></div></div><div class="field"><label>Project</label><div id="vDocProject" class="input"></div></div>
+<div class="field"><label>Document Type</label><div id="vDocType" class="input"></div></div><div class="field"><label>Current Status</label><div id="vDocStatus" class="input"></div></div>
+<div class="field full"><label>Uploaded</label><div id="vDocDate" class="input"></div></div></div><div style="margin-top:16px"><button type="button" class="btn" onclick="closeModal('docViewModal')">Close</button></div></div></div>
+<div class="modal" id="docModal" onclick="if(event.target===this)closeModal('docModal')"><div class="modalbox"><h3>Upload Project Document</h3><form method="post" action="/documents/upload" enctype="multipart/form-data" class="formgrid">
+<div class="field full"><label>Project</label><select class="select" name="project_id">{% for p in projects %}<option value="{{p.project_id}}">{{p.project_id}} — {{p.name}}</option>{% endfor %}</select></div>
+<div class="field"><label>Parcel (optional)</label><select class="select" name="parcel_id"><option value="">Project-level document</option><option value="P-001">P-001 — Survey 125</option><option value="P-002">P-002 — Survey 126</option><option value="P-003">P-003 — Survey 128</option></select></div>
+<div class="field"><label>Document Name</label><input class="input" name="name" required placeholder="DPR.pdf"></div><div class="field"><label>Document Type</label><select class="select" name="dtype"><option>DPR</option><option>Project Plan</option><option>Land Requirement</option><option>Map</option><option>Survey</option><option>Approval</option></select></div>
+<div class="field full"><label>File</label><input class="input" type="file" name="file" onchange="validateUpload(this)" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg"></div>
+<div class="field full"><button class="btn">Upload Document</button></div></form></div></div>
+<script>
+function viewDocument(name,project,type,status,date){
+ document.getElementById('vDocName').textContent=name;
+ document.getElementById('vDocProject').textContent=project;
+ document.getElementById('vDocType').textContent=type;
+ document.getElementById('vDocStatus').textContent=status;
+ document.getElementById('vDocDate').textContent=date;
+ openModal('docViewModal');
+}
+</script>
+{% endblock %}

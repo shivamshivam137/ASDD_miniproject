@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% block content %}
+<section class="welcome"><div><h2>Good morning, Officer 👋</h2><p>Review and verify land records assigned to your department.</p></div><a class="primary" href="{{ url_for('cases') }}">＋ View Assigned Cases</a></section>
+<div class="cards">
+  <div class="stat"><span>Total Cases</span><strong>{{stats.total}}</strong><em>Assigned to you</em></div>
+  <div class="stat amber"><span>Pending Verification</span><strong>{{stats.pending}}</strong><em>Requires action</em></div>
+  <div class="stat green"><span>Verified</span><strong>{{stats.verified}}</strong><em>Completed checks</em></div>
+  <div class="stat red"><span>Record Issues</span><strong>{{stats.issues}}</strong><em>Needs attention</em></div>
+</div>
+<div class="grid2">
+<div class="panel"><div class="panelhead"><div><h3>Verification Workflow</h3><p>Current role in the acquisition process</p></div></div>
+<div class="workflow">
+<div class="step done"><b>1</b><div><strong>Case Assigned</strong><small>LAO sends case</small></div></div>
+<div class="line"></div>
+<div class="step current"><b>2</b><div><strong>Revenue Verification</strong><small>Ownership, area & records</small></div></div>
+<div class="line"></div>
+<div class="step"><b>3</b><div><strong>GIS Verification</strong><small>Parcel confirmation</small></div></div>
+<div class="line"></div>
+<div class="step"><b>4</b><div><strong>Landowner Notification</strong><small>Next workflow stage</small></div></div>
+</div></div>
+<div class="panel"><div class="panelhead"><div><h3>Priority Checks</h3><p>Items to review before approval</p></div></div>
+<div class="checks"><div>✓ <span>Ownership match</span><b>Critical</b></div><div>✓ <span>Survey & area match</span><b>Critical</b></div><div>✓ <span>Encumbrance status</span><b>High</b></div><div>✓ <span>Mutation history</span><b>Medium</b></div></div></div>
+</div>
+<div class="panel"><div class="panelhead"><div><h3>Recent Land Acquisition Cases</h3><p>Cases currently in your queue</p></div><a href="{{url_for('cases')}}">View all →</a></div>
+<table><thead><tr><th>Case</th><th>Project</th><th>Location</th><th>Survey</th><th>Area</th><th>Status</th><th></th></tr></thead>
+<tbody>{% for c in cases[:5] %}<tr><td><b>{{c.case_id}}</b></td><td>{{c.project}}</td><td>{{c.village}}, {{c.district}}</td><td>{{c.survey_no}}</td><td>{{c.area}} ha</td><td><span class="pill {{c.status|lower|replace(' ','-')}}">{{c.status}}</span></td><td><a class="smallbtn" href="{{url_for('case_detail',case_id=c.case_id)}}">Open</a></td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% block title %}Risk & Delay Radar{% endblock %}{% block content %}
+<div class="titlebar"><div><h1>Acquisition Risk Radar</h1><p>Risk scoring, delay analysis and SLA escalation monitoring</p></div><button class="btn primary" onclick="runRisk()">Run Risk Analysis</button></div>
+<div class="cols"><section class="panel radar"><div class="ph"><h3>Acquisition Risk Radar</h3></div><div class="riskring"><div><b id="high">0</b><small>High Risk</small></div></div><div id="riskcounts" class="riskcounts"></div></section><section class="panel"><div class="ph"><h3>Delay Analysis</h3></div><div class="delaybars"><div><i style="height:72%"></i><b>72%</b><small>On Time</small></div><div><i style="height:43%"></i><b>18%</b><small>At Risk</small></div><div><i style="height:25%"></i><b>10%</b><small>Delayed</small></div></div></section></div>
+<section class="panel"><div class="ph"><h3>SLA & Escalation Monitoring</h3><span id="riskmsg"></span></div><div class="table"><table><thead><tr><th>Task</th><th>Total</th><th>Overdue</th><th>SLA %</th><th>Action</th></tr></thead><tbody id="sla"></tbody></table></div></section>
+{% endblock %}{% block scripts %}<script>
+async function runRisk(){
+ try{
+  const p=await api('/api/projects');
+  const high=p.filter(x=>x.risk==='High').length;
+  document.getElementById('high').textContent=high;
+  const c={High:p.filter(x=>x.risk==='High').length,Medium:p.filter(x=>x.risk==='Medium').length,Low:p.filter(x=>x.risk==='Low').length};
+  document.getElementById('riskcounts').innerHTML=Object.entries(c).map(([k,v])=>`<span>${risk(k)} <b>${v}</b></span>`).join('');
+  const tasks=['Revenue Verification','GIS Verification','Notification','Award','Compensation','R&R'];
+  document.getElementById('sla').innerHTML=tasks.map((x,i)=>`<tr><td>${esc(x)}</td><td>${42-i*3}</td><td class="${i%2?'warn':''}">${i%2?1:i+2}</td><td>${66+i*5}%</td><td><button class="link-btn" onclick="viewSla(${i})">View</button></td></tr>`).join('');
+  document.getElementById('riskmsg').textContent=high+' high-risk projects require attention';
+ }catch(e){toast('Risk analysis could not be loaded','error')}
+}
+function viewSla(i){
+ const tasks=['Revenue Verification','GIS Verification','Notification','Award','Compensation','R&R'];
+ const totals=[42,39,36,33,30,27], overdue=[2,1,4,5,6,7], sla=[66,71,76,81,86,91];
+ modal(`<h2>${esc(tasks[i])}</h2><div class="overview"><div class="bigstat"><b>${totals[i]}</b><small>Total Tasks</small></div><div class="bigstat"><b>${overdue[i]}</b><small>Overdue</small></div><div class="bigstat"><b>${sla[i]}%</b><small>SLA Compliance</small></div></div><div class="card"><h3>Escalation Details</h3><p>Review overdue cases assigned to this workflow task and escalate items that have crossed their SLA target.</p><div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="createEscalation('${tasks[i]}')">Open Escalation</button></div></div>`);
+}
+function createEscalation(task){closeModal();toast('Escalation opened for '+task,'success')}
+runRisk();
+</script>{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Duplicate & Integrity{% endblock %}{% block content %}
+<div class="titlebar"><div><h1>Duplicate & Conflict Detection</h1><p>Possible duplicates, ownership conflicts, area mismatches and document integrity.</p></div><button class="btn primary" onclick="scan()">Run Integrity Scan</button></div>
+<div class="panel"><div class="tabs"><b>Possible Duplicates</b><b>Ownership Conflicts</b><b>Area Mismatch</b></div><div class="table"><table><thead><tr><th>Project ID</th><th>Survey No.</th><th>Village</th><th>Issue</th><th>Severity</th><th>Action</th></tr></thead><tbody id="conf"></tbody></table></div></div>
+<div class="cols"><section class="panel"><div class="ph"><h3>Document Integrity & Version Tracking</h3></div><div class="table"><table><thead><tr><th>Document</th><th>Version</th><th>Uploaded By</th><th>Status</th><th>Integrity</th><th>Action</th></tr></thead><tbody id="docs"></tbody></table></div></section><section class="panel verify"><div class="shield">✓</div><h2>Integrity Verified</h2><p>All indexed documents passed the current integrity checks.</p></section></div>
+{% endblock %}{% block scripts %}<script>
+let conflictRows=[],documentRows=[];
+async function scan(){
+ try{
+  conflictRows=await api('/api/conflicts'); documentRows=await api('/api/documents');
+  document.getElementById('conf').innerHTML=conflictRows.map((x,i)=>`<tr><td>${esc(x.project_id)}</td><td>${esc(x.survey_no)}</td><td>${esc(x.village)}</td><td>${esc(x.issue)}</td><td>${risk(x.severity)}</td><td><button class="link-btn" onclick="viewConflict(${i})">View</button></td></tr>`).join('');
+  document.getElementById('docs').innerHTML=documentRows.map((x,i)=>`<tr><td>${esc(x.name)}</td><td>${esc(x.version)}</td><td>${esc(x.uploaded_by)}</td><td>${status(x.status)}</td><td>${status(x.integrity)}</td><td><button class="link-btn" onclick="viewDocument(${i})">View</button></td></tr>`).join('');
+  toast('Integrity scan completed','success');
+ }catch(e){toast('Integrity scan failed','error')}
+}
+function viewConflict(i){const x=conflictRows[i];modal(`<h2>Conflict Review</h2><div class="detail-grid"><div><small>Project ID</small><b>${esc(x.project_id)}</b></div><div><small>Survey No.</small><b>${esc(x.survey_no)}</b></div><div><small>Village</small><b>${esc(x.village)}</b></div><div><small>Issue</small><b>${esc(x.issue)}</b></div><div><small>Type</small><b>${esc(x.conflict_type||x.issue)}</b></div><div><small>Severity</small>${risk(x.severity)}</div><div><small>Status</small>${status(x.status)}</div></div><p class="muted">Review the source land record, survey entry and supporting documents before resolving this anomaly.</p><div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="toast('Conflict marked for review','success');closeModal()">Mark for Review</button></div>`)}
+function viewDocument(i){const x=documentRows[i];modal(`<h2>Document Integrity</h2><div class="detail-grid"><div><small>Document</small><b>${esc(x.name)}</b></div><div><small>Project</small><b>${esc(x.project_id)}</b></div><div><small>Version</small><b>${esc(x.version)}</b></div><div><small>Uploaded By</small><b>${esc(x.uploaded_by)}</b></div><div><small>Status</small>${status(x.status)}</div><div><small>Integrity</small>${status(x.integrity)}</div></div><p class="muted">The indexed version is available for audit comparison. Use the latest approved version when validating the case file.</p><div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="toast('Document review opened','success');closeModal()">Review Version</button></div>`)}
+scan();
+</script>{% endblock %}

@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block title %}Audit Trail{% endblock %}{% block content %}
+<div class="toolbar"><div><h2>Audit Trail</h2><p>Immutable-style activity history for revenue verification actions.</p></div><div class="auditstats">{{rows|length}} recorded events</div></div>
+<div class="panel"><table><thead><tr><th>Time</th><th>Case</th><th>Project</th><th>Action</th><th>Actor</th></tr></thead><tbody>{% for r in rows %}<tr><td>{{r.created_at}}</td><td><b>{{r.case_id}}</b></td><td>{{r.project or '—'}}</td><td><span class="auditaction">{{r.action}}</span></td><td>{{r.actor}}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

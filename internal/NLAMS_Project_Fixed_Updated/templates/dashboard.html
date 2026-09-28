@@ -1,0 +1,31 @@
+
+{% extends "base.html" %}{% block title %}Dashboard · NLAMS{% endblock %}{% block content %}
+<div class="heading"><div><h1>Welcome, Vrushali Ghatage!</h1><p>Overview of land acquisition projects, milestones, R&R and citizen issues.</p></div>
+<a class="btn" href="/projects/new">＋ Create New Project</a></div>
+<div class="grid6">
+<div class="stat"><div class="icon">📁</div><div class="label">Total Projects</div><div class="value">{{stats.projects}}</div><div class="trend">↑ 1 new this month</div></div>
+<div class="stat"><div class="icon">🗺️</div><div class="label">Land Required</div><div class="value">{{"%.0f"|format(stats.land_required)}} Ha</div><div class="trend">↑ 124 Ha this month</div></div>
+<div class="stat"><div class="icon">🌱</div><div class="label">Land Acquired</div><div class="value">{{"%.0f"|format(stats.land_acquired)}} Ha</div><div class="trend">↑ 60 Ha this month</div></div>
+<div class="stat"><div class="icon">₹</div><div class="label">Compensation Assessed</div><div class="value">₹ 248 Cr</div><div class="trend">↑ 32 Cr this month</div></div>
+<div class="stat"><div class="icon">👥</div><div class="label">Affected Families</div><div class="value">1,842</div><div class="trend">↑ 210 this month</div></div>
+<div class="stat"><div class="icon">📄</div><div class="label">Pending Approvals</div><div class="value">3</div><div class="trend" style="color:#ef4444">↓ 2 less than last month</div></div>
+</div>
+<div class="card" style="margin-top:16px"><h3>Project Workflow — NH-44 Expansion</h3><div class="workflow">
+{% for s in [('✓','Project Created','done'),('✓','Land Requirement','done'),('✓','Document Upload','done'),('➤','Submission','done'),('⌕','Verification','active'),('◉','Notification',''),('₹','Compensation',''),('👥','R&R',''),('⌖','Possession',''),('⚑','Closure','')] %}
+<div class="step {{s[2]}}"><div class="dot">{{s[0]}}</div><b style="font-size:10px;display:block;margin-top:6px">{{s[1]}}</b><small>{{'Completed' if s[2]=='done' else ('In Progress' if s[2]=='active' else 'Pending')}}</small></div>
+{% endfor %}</div></div>
+<div class="grid2">
+<div class="card"><h3>Project Progress Overview</h3><div class="grid3">
+<div><div class="mini">Land Notification</div><div class="progress"><i style="width:90%"></i></div><b>90%</b></div>
+<div><div class="mini">Land Acquisition</div><div class="progress"><i style="width:65%"></i></div><b>65%</b></div>
+<div><div class="mini">Compensation</div><div class="progress"><i style="width:40%"></i></div><b>40%</b></div>
+</div><div style="margin-top:18px"><div class="mini">R&R</div><div class="progress"><i style="width:30%"></i></div><b>30%</b></div></div>
+<div class="card"><h3>Quick Actions</h3><div style="display:grid;gap:8px"><a class="btn" href="/projects/new">＋ Add New Project</a><a class="btn secondary" href="/documents">▧ Upload Document</a><a class="btn secondary" href="/reports">▥ Generate Report</a><a class="btn secondary" href="/land">⌖ View GIS Map</a><a class="btn secondary" href="/grievance">💬 Track Grievance</a></div></div>
+</div>
+<div class="grid2">
+<div class="card"><div class="heading"><h3>My Projects</h3><a class="mini" href="/projects">View all →</a></div><div class="table-wrap"><table class="table"><thead><tr><th>ID</th><th>Project</th><th>Location</th><th>Land</th><th>Stage</th><th>Progress</th><th></th></tr></thead><tbody>
+{% for p in projects %}<tr><td>{{p.project_id}}</td><td><b>{{p.name}}</b><div class="mini">{{p.department}}</div></td><td>{{p.villages}}</td><td>{{p.land_required}} Ha</td><td><span class="badge blue">{{p.stage}}</span></td><td><div class="progress" style="width:100px"><i style="width:{{p.progress}}%"></i></div>{{p.progress}}%</td><td><a class="btn secondary" href="/project/{{p.project_id}}">View</a></td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="card"><h3>Recent Activities</h3>{% for a in activities %}<div class="event"><b>{{a.action}}</b><small>{{a.actor}} · {{a.created_at}}</small></div>{% endfor %}</div>
+</div>
+{% endblock %}

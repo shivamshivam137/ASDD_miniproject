@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% block title %}Case Verification{% endblock %}{% block content %}
+<div class="casehero"><div><div class="eyebrow">ACQUISITION CASE</div><h2>{{case.case_id}} <span class="pill {{case.status|lower|replace(' ','-')}}">{{case.status}}</span></h2><p>{{case.project}} • {{case.village}}, {{case.taluka}}, {{case.district}}</p></div><a class="ghost" href="{{url_for('cases')}}">← Back to Cases</a></div>
+<div class="casegrid">
+<div>
+<div class="panel"><div class="panelhead"><div><h3>Land Record Verification</h3><p>Compare project agency data with revenue records.</p></div></div>
+<div class="compare"><div><label>PROJECT AGENCY RECORD</label><h4>{{case.agency_owner}}</h4><p>Survey No. {{case.survey_no}} • {{case.area}} ha</p></div><div class="versus">VS</div><div><label>REVENUE RECORD</label><h4>{{case.revenue_owner}}</h4><p>Survey No. {{case.survey_no}} • {{case.area}} ha</p></div></div>
+<div class="verifylist"><div>✓ <span>Survey Number</span><b>Verified</b></div><div>✓ <span>Village / Taluka / District</span><b>Verified</b></div><div>✓ <span>Land Area</span><b>Verified</b></div><div class="{{'bad' if case.agency_owner != case.revenue_owner else ''}}">✓ <span>Ownership</span><b>{{'Mismatch' if case.agency_owner != case.revenue_owner else 'Verified'}}</b></div><div>✓ <span>Land Classification</span><b>{{case.land_type}}</b></div></div></div>
+
+<div class="panel"><div class="panelhead"><div><h3>GIS Parcel Verification</h3><p>Prototype cadastral parcel view linked to Survey No. {{case.survey_no}}</p></div><span class="maptag">LIVE PARCEL VIEW</span></div>
+<div class="map"><div class="road r1"></div><div class="road r2"></div><div class="parcel p1"><span>124</span></div><div class="parcel selected"><span>{{case.survey_no}}<small>{{case.area}} ha</small></span></div><div class="parcel p3"><span>126</span></div><div class="compass">N<br>↑</div><div class="maplegend"><span><i></i> Selected Parcel</span><span><i class="gray"></i> Adjacent Parcels</span></div></div>
+</div>
+
+<div class="panel"><div class="panelhead"><div><h3>Mutation / Ownership History</h3><p>Historical chain associated with the parcel.</p></div></div>
+<div class="timeline"><div><b>1985</b><span>Shankar Patil</span><small>Original owner</small></div><div><b>2002</b><span>Suresh Patil</span><small>Mutation recorded</small></div><div><b>2017</b><span>Rajesh Patil</span><small>Sale / inheritance transfer</small></div><div class="now"><b>2026</b><span>{{case.revenue_owner}}</span><small>Current revenue record</small></div></div></div>
+</div>
+
+<aside>
+<div class="panel actionpanel"><h3>Verification Decision</h3><p>Complete all checks before submitting your decision to LAO.</p>
+<form method="post" action="{{url_for('verify',case_id=case.case_id)}}"><button class="action approve" data-confirm="Approve revenue verification for this case?">✓ Approve Verification</button></form>
+<button class="action flag" onclick="document.getElementById('flagbox').style.display='block'">⚠ Flag Issue</button>
+<form method="post" action="{{url_for('reject',case_id=case.case_id)}}" onsubmit="return confirm('Reject this case?')"><input name="description" class="hiddeninput" placeholder="Reason"><button class="action reject">× Reject Case</button></form>
+<div id="flagbox" style="display:none" class="flagbox"><form method="post" action="{{url_for('flag',case_id=case.case_id)}}"><select name="issue_type"><option>Record Mismatch</option><option>Ownership Issue</option><option>Area Mismatch</option><option>Encumbrance</option><option>Missing Document</option></select><textarea name="description" placeholder="Describe the issue..."></textarea><button class="primary full">Submit Issue</button></form></div>
+</div>
+<div class="panel"><h3>Encumbrance Check</h3><div class="enc {{'clear' if case.encumbrance=='Clear' else 'warn'}}"><strong>{{'✓ CLEAR' if case.encumbrance=='Clear' else '⚠ ENCUMBRANCE FOUND'}}</strong><span>{{'No active legal/financial restriction detected.' if case.encumbrance=='Clear' else 'Active mortgage requires further review.'}}</span></div></div>
+<div class="panel"><h3>Documents</h3>{% for d in docs %}<div class="doc"><span>📄 {{d.name}}</span><form method="post" action="{{url_for('document',case_id=case.case_id,doc_id=d.id)}}"><select name="status" onchange="this.form.submit()"><option {% if d.status=='Verified' %}selected{% endif %}>Verified</option><option {% if d.status=='Pending' %}selected{% endif %}>Pending</option><option {% if d.status=='Issue' %}selected{% endif %}>Issue</option></select></form></div>{% endfor %}</div>
+<div class="panel"><h3>Case Information</h3><div class="info"><span>Case ID</span><b>{{case.case_id}}</b><span>Survey No.</span><b>{{case.survey_no}}</b><span>Total Area</span><b>{{case.area}} ha</b><span>Land Type</span><b>{{case.land_type}}</b><span>Location</span><b>{{case.village}}, {{case.taluka}}</b></div></div>
+</aside></div>
+
+<div class="panel"><div class="panelhead"><div><h3>Audit Trail</h3><p>Every verification action is recorded.</p></div></div>
+<div class="audit">{% if audit %}{% for a in audit %}<div><span class="dot"></span><div><b>{{a.action}}</b><small>{{a.actor}} • {{a.created_at}}</small></div></div>{% endfor %}{% else %}<p class="muted">No actions recorded yet.</p>{% endif %}</div></div>
+{% endblock %}

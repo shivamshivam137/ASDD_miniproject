@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}Audit Trail{% endblock %}{% block content %}<section class=card><h2>Officer Activity Register</h2><table><tr><th>Time</th><th>Action</th><th>Entity</th><th>Details</th></tr>{% for r in rows %}<tr><td>{{r.at}}</td><td>{{r.action}}</td><td>{{r.entity}}</td><td>{{r.details}}</td></tr>{% endfor %}</table></section>{% endblock %}

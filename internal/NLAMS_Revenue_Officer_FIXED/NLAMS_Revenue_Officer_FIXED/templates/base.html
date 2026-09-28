@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NLAMS • Revenue Officer</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body data-nlams-role="revenue_officer">
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">N</div><div><b>NLAMS</b><span>Land Management System</span></div></div>
+  <div class="role"><span class="avatar">RO</span><div><b>Revenue Officer</b><small>District Revenue Dept.</small></div></div>
+  <nav>
+    <a class="{{ 'active' if active=='dashboard' else '' }}" href="{{ url_for('dashboard') }}">⌂ <span>Dashboard</span></a>
+    <a class="{{ 'active' if active=='cases' else '' }}" href="{{ url_for('cases') }}">▣ <span>Land Cases</span></a>
+    <a class="{{ 'active' if active=='gis' else '' }}" href="{{ url_for('gis') }}">⌖ <span>GIS Verification</span></a>
+    <a class="{{ 'active' if active=='documents' else '' }}" href="{{ url_for('documents') }}">▤ <span>Documents</span></a>
+    <a class="{{ 'active' if active=='notifications' else '' }}" href="{{ url_for('notifications') }}">◔ <span>Notifications</span></a>
+    <a class="{{ 'active' if active=='audit' else '' }}" href="{{ url_for('audit') }}">◷ <span>Audit Trail</span></a>
+  </nav>
+  <div class="help"><b>Need help?</b><p>Check the verification workflow guide.</p><button>View Guide</button></div>
+  <div class="sidebottom">● System Online<br><small>NLAMS v1.0 • Prototype</small></div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <div><span class="crumb">NLAMS / Revenue Department</span><h1>{% block title %}Revenue Officer Dashboard{% endblock %}</h1></div>
+  <div class="top-actions"><button class="iconbtn">⌕</button><a class="iconbtn" href="{{ url_for('notifications') }}">🔔</a><div class="profile"><span class="avatar dark">RO</span><div><b>Revenue Officer</b><small>Haveli, Pune</small></div>⌄</div></div>
+</header>
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% for category,message in messages %}<div class="flash {{category}}">{{message}}</div>{% endfor %}
+{% endwith %}
+{% block content %}{% endblock %}
+</main>
+</div>
+<script>
+document.querySelectorAll('[data-confirm]').forEach(x=>x.addEventListener('click',e=>{
+ if(!confirm(x.dataset.confirm)) e.preventDefault();
+}));
+</script>
+<script src="/static/integration.js"></script></body>
+</html>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>Compensation Management</h1><p>Monitor compensation assessment, approval and disbursement status. Payment actions are handled by the Admin.</p></div><a class="btn" href="/reports/export/compensation">↓ Export CSV</a></div>
+<div class="kpi-row"><div class="kpi"><div class="mini">Assessed</div><strong>₹ {{ "%.1f"|format(totals[0]) }} Cr</strong></div><div class="kpi"><div class="mini">Approved</div><strong>₹ {{ "%.1f"|format(totals[1]) }} Cr</strong></div><div class="kpi"><div class="mini">Disbursed</div><strong>₹ {{ "%.1f"|format(totals[2]) }} Cr</strong></div><div class="kpi"><div class="mini">Pending</div><strong>₹ {{ "%.1f"|format(totals[1]-totals[2]) }} Cr</strong></div></div>
+<div class="card" style="margin-top:16px"><div class="table-wrap"><table class="table"><thead><tr><th>Family ID</th><th>Owner</th><th>Parcel</th><th>Assessed</th><th>Approved</th><th>Disbursed</th><th>Status</th><th>Payment Ref</th><th>View</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{r.family_id}}</td><td>{{r.owner}}</td><td>{{r.parcel}}</td><td>₹{{r.assessed}} Cr</td><td>₹{{r.approved}} Cr</td><td>₹{{r.disbursed}} Cr</td>
+<td><span class="badge {% if r.status=='Disbursed' %}green{% else %}orange{% endif %}">{{r.status}}</span></td><td>{{r.payment_ref or '—'}}</td>
+<td><button type="button" class="btn" onclick="viewComp('{{r.family_id|e}}','{{r.owner|e}}','{{r.parcel|e}}','{{r.assessed}}','{{r.approved}}','{{r.disbursed}}','{{r.status|e}}','{{r.payment_ref|e}}')">View</button></td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="modal" id="compViewModal" onclick="if(event.target===this)closeModal('compViewModal')"><div class="modalbox"><h3>Compensation Details</h3><div class="formgrid">
+<div class="field"><label>Family ID</label><div id="cFamily" class="input"></div></div><div class="field"><label>Owner</label><div id="cOwner" class="input"></div></div>
+<div class="field"><label>Parcel</label><div id="cParcel" class="input"></div></div><div class="field"><label>Status</label><div id="cStatus" class="input"></div></div>
+<div class="field"><label>Assessed</label><div id="cAssessed" class="input"></div></div><div class="field"><label>Approved</label><div id="cApproved" class="input"></div></div>
+<div class="field"><label>Disbursed</label><div id="cDisbursed" class="input"></div></div><div class="field"><label>Payment Reference</label><div id="cRef" class="input"></div></div>
+</div><div style="margin-top:16px"><button type="button" class="btn" onclick="closeModal('compViewModal')">Close</button></div></div></div>
+<script>
+function viewComp(f,o,p,a,ap,d,s,ref){['cFamily','cOwner','cParcel','cAssessed','cApproved','cDisbursed','cStatus','cRef'].forEach((id,i)=>document.getElementById(id).textContent=[f,o,p,'₹ '+a+' Cr','₹ '+ap+' Cr','₹ '+d+' Cr',s,ref||'—'][i]);openModal('compViewModal');}
+</script>
+{% endblock %}

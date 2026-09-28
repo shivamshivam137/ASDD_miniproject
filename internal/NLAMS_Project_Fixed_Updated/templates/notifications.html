@@ -1,0 +1,6 @@
+
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>Notifications & Escalations</h1><p>Deadline alerts, workflow events and system notifications.</p></div></div>
+<div class="card">{% for n in rows %}<div class="alert {{n.ntype}}"><b>{{n.title}}</b><div>{{n.body}}</div><div class="mini">{{n.created_at}} · {% if n.read_flag %}Read{% else %}Unread{% endif %}</div>{% if not n.read_flag %}<form method="post" action="/notifications/read/{{n.id}}" style="margin-top:6px"><button class="btn secondary">Mark as read</button></form>{% endif %}</div>{% endfor %}</div>
+<div class="card" style="margin-top:16px"><h3>Automatic Escalation Example</h3><div class="workflow"><div class="step done"><div class="dot">✓</div><b>Officer Verification</b><small>Day 0</small></div><div class="step done"><div class="dot">5</div><b>Reminder</b><small>2 days remaining</small></div><div class="step active"><div class="dot">⚠</div><b>Escalation</b><small>Senior Officer</small></div></div></div>
+{% endblock %}

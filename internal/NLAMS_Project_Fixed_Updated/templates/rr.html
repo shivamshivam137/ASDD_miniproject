@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>R&R Management</h1><p>Track affected/displaced families, benefit allocation and rehabilitation progress. Update the case status and progress from this section.</p></div></div>
+<div class="grid3"><div class="stat"><div class="label">Total Affected Families</div><div class="value">1,842</div></div><div class="stat"><div class="label">Displaced Families</div><div class="value">732</div></div><div class="stat"><div class="label">R&R Completion</div><div class="value">68%</div></div></div>
+<div class="card" style="margin-top:16px"><div class="table-wrap"><table class="table"><thead><tr><th>Family ID</th><th>Head of Family</th><th>Village</th><th>Land Area</th><th>Benefit</th><th>Status</th><th>Progress</th><th>Update Status</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{r.family_id}}</td><td>{{r.head}}</td><td>{{r.village}}</td><td>{{r.land_area}} Ha</td><td>{{r.benefit}}</td>
+<td><span class="badge {% if r.status=='Completed' %}green{% elif r.status=='Rejected' %}red{% else %}orange{% endif %}">{{r.status}}</span></td><td>{{r.progress}}%</td>
+<td><form method="post" action="/rr/{{r.id}}/update" style="display:flex;gap:6px;align-items:center">
+<select class="select" name="status" style="min-width:125px"><option value="Pending" {% if r.status=='Pending' %}selected{% endif %}>Pending</option><option value="In Progress" {% if r.status=='In Progress' %}selected{% endif %}>In Progress</option><option value="Completed" {% if r.status=='Completed' %}selected{% endif %}>Completed</option><option value="Rejected" {% if r.status=='Rejected' %}selected{% endif %}>Rejected</option></select>
+<input class="input" name="progress" type="number" min="0" max="100" value="{{r.progress}}" style="width:78px" aria-label="Progress percentage"><button class="btn">Update</button></form></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

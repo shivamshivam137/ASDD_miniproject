@@ -1,0 +1,130 @@
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ g.ticket }} — NLAMS Grievance</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+<header class="topbar"><div class="brand"><div class="brandmark">NL</div><div><b>NLAMS</b><small>National Land Acquisition & Management System</small></div></div><div class="crumb">Grievances / View Details</div><div class="top-actions"><span class="role">District Administration</span><span class="user-dot">AD</span><span>{{ officer_name }}</span><a class="logout" href="/logout">Logout</a></div></header>
+<div class="detail-page">
+  <div class="case-header">
+    <div>
+      <a class="back" href="/dashboard">← Back to All Grievances</a>
+      <div class="eyebrow">GRIEVANCE DETAILS / LANDOWNER CASE VIEW</div>
+      <h1>{{ g.ticket }}</h1>
+      <p>{{ g.subject }}</p>
+    </div>
+    <div class="case-header-right">
+      <span class="status-badge status-{{ g.status|lower|replace(' ','-') }}">{{ g.status }}</span>
+      <span class="priority-pill {{ g.priority|lower }}">{{ g.priority }} Priority</span>
+    </div>
+  </div>
+
+  <div class="case-summary">
+    <div><small>Landowner</small><b>{{ g.name }}</b><span>{{ g.owner_code }}</span></div>
+    <div><small>Affected Project</small><b>{{ g.project_name }}</b><span>{{ g.project_code }}</span></div>
+    <div><small>Survey / Gat No.</small><b>{{ g.survey_no }}</b><span>{{ g.village }}, {{ g.district }}</span></div>
+    <div><small>SLA Due</small><b>{{ g.sla_due }}</b><span>Assigned: {{ g.assigned_to }}</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <div class="left-col">
+      <div class="panel screenshot-panel" id="aiDocPanel">
+        <div class="panel-head"><h2>🤖 AI Document Requirement Guide</h2><span class="small-muted">Reduce document confusion</span></div>
+        <p class="muted">Based on the grievance category and description, NLAMS suggests the documents that are useful for verification.</p>
+        <button class="primary-btn" type="button" onclick="loadDocGuide()">Generate Required Document Checklist</button>
+        <div id="aiDocGuide" style="margin-top:12px"></div>
+      </div>
+
+      <div class="panel screenshot-panel">
+        <div class="panel-head"><h2>Complaint Details</h2><span class="small-muted">Submitted {{ g.created }}</span></div>
+        <div class="detail-fields">
+          <div><small>Landowner</small><b>{{ g.name }}</b></div>
+          <div><small>Category</small><b>{{ g.category }}</b></div>
+          <div><small>Project</small><b>{{ g.project_name }}</b></div>
+          <div><small>Survey / Gat No.</small><b>{{ g.survey_no }}</b></div>
+          <div><small>Assigned To</small><b>{{ g.assigned_to }}</b></div>
+          <div><small>Submitted</small><b>{{ g.created }}</b></div>
+        </div>
+        <hr>
+        <h3>Description</h3><p class="body-text">{{ g.description }}</p>
+        {% if g.officer_response %}<h3>Officer Response</h3><p class="body-text">{{ g.officer_response }}</p>{% endif %}
+        {% if g.remarks %}<h3>Latest Remarks</h3><p class="body-text">{{ g.remarks }}</p>{% endif %}
+        <h3>Evidence / Documents</h3><div id="detailDocs" class="doc-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Landowner Profile</h2><span class="verified">✓ Identity record</span></div>
+        <div class="profile-grid">
+          <div><small>Landowner ID</small><b>{{ g.owner_code }}</b></div>
+          <div><small>Mobile</small><b>{{ g.mobile }}</b></div>
+          <div><small>Email</small><b>{{ g.email }}</b></div>
+          <div><small>Family Members</small><b>{{ g.family_members }}</b></div>
+          <div><small>Affected Family Members</small><b>{{ g.affected_family_members }}</b></div>
+          <div class="span-2"><small>Address</small><b>{{ g.address }}, {{ g.village }}, {{ g.taluka }}, {{ g.district }}, {{ g.state }}</b></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Project & Affected Land Details</h2><span class="project-code">{{ g.project_code }}</span></div>
+        <div class="project-banner">
+          <div><small>Project Name</small><strong>{{ g.project_name }}</strong></div>
+          <div><small>Implementing Agency</small><strong>{{ g.agency }}</strong></div>
+          <div><small>Acquiring Authority</small><strong>{{ g.authority }}</strong></div>
+        </div>
+        <div class="detail-fields">
+          <div><small>Project Type</small><b>{{ g.project_type }}</b></div>
+          <div><small>Project District / State</small><b>{{ g.project_district }}, {{ g.project_state }}</b></div>
+          <div><small>Survey / Gat No.</small><b>{{ g.survey_no }}</b></div>
+          <div><small>Total Land</small><b>{{ g.total_area }}</b></div>
+          <div><small>Affected Land</small><b>{{ g.affected_area }}</b></div>
+          <div><small>Acquired Land</small><b>{{ g.acquired_area }}</b></div>
+          <div><small>Acquisition Stage</small><b>{{ g.acquisition_stage }}</b></div>
+          <div><small>Notification No.</small><b>{{ g.notification_no }}</b></div>
+          <div><small>Award No.</small><b>{{ g.award_no }}</b></div>
+          <div><small>Possession</small><b>{{ g.possession_status }}</b></div>
+          <div><small>R&R Status</small><b>{{ g.rr_status }}</b></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Compensation Summary</h2><span class="verified">Financial record</span></div>
+        <div class="money-grid">
+          <div><small>Total Assessed</small><b>₹{{ '{:,.0f}'.format(g.compensation_assessed or 0) }}</b></div>
+          <div><small>Paid</small><b>₹{{ '{:,.0f}'.format(g.compensation_paid or 0) }}</b></div>
+          <div class="pending-money"><small>Pending</small><b>₹{{ '{:,.0f}'.format((g.compensation_assessed or 0)-(g.compensation_paid or 0)) }}</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="panel screenshot-panel">
+        <div class="panel-head"><h2>Status Timeline</h2><span class="small-muted">Case history</span></div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+
+      <div class="panel action-panel">
+        <h2>Take Action</h2>
+        <p class="muted action-intro">Update the grievance status and record verification findings. Changes are added to the timeline and audit trail.</p>
+        <form id="actionForm" onsubmit="saveAction(event)">
+          <label>Change Status<select id="actionStatus"><option>Open</option><option>Assigned</option><option>Under Verification</option><option>Under Review</option><option>Action Taken</option><option>Resolved</option><option>Escalated</option><option>Rejected</option></select></label>
+          <label>Priority<select id="actionPriority"><option>High</option><option>Medium</option><option>Low</option></select></label>
+          <label>Category<select id="actionCategory"><option>Compensation</option><option>Possession</option><option>R&R</option><option>Land Record</option><option>Wrong land/parcel information</option><option>Notification issue</option><option>Document issue</option><option>Other</option></select></label>
+          <label>Remarks<textarea id="actionRemarks" placeholder="Verification findings / action taken…"></textarea></label>
+          <label>Resolution / Response<textarea id="actionResponse" placeholder="Write the response visible to the landowner…"></textarea></label>
+          <button class="primary-btn full" type="submit">Save Officer Action</button>
+          <div id="saveOut"></div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Case Accountability</h2>
+        <div class="audit-box">
+          <div><small>Role</small><b>Grievance Officer</b></div>
+          <div><small>Last Updated</small><b id="lastUpdated">{{ g.updated }}</b></div>
+          <div><small>Assignment</small><b>{{ g.assigned_to }}</b></div>
+          <div><small>SLA Due</small><b>{{ g.sla_due }}</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+async function loadDocGuide(){try{const t={{ (g.description or "")|tojson }};const cat={{ (g.category or "")|tojson }};const r=await fetch('http://127.0.0.1:8090/api/ai/document-guide?text='+encodeURIComponent(t)+'&category='+encodeURIComponent(cat));const x=await r.json();document.getElementById('aiDocGuide').innerHTML='<b>Suggested checklist</b>'+x.documents.map(d=>'<div style="padding:8px 0;border-bottom:1px solid #eee"><b>📄 '+d.name+'</b><br><small>'+d.why+'</small></div>').join('')+'<p class="muted">'+x.note+'</p>';}catch(e){document.getElementById('aiDocGuide').innerHTML='<span class="warn">Unable to reach the NLAMS AI document guide.</span>';}}
+</script><script>window.TICKET={{ g.ticket|tojson }};window.INIT_STATUS={{ g.status|tojson }};window.INIT_PRIORITY={{ g.priority|tojson }};window.INIT_CATEGORY={{ g.category|tojson }};</script><script src="/static/app.js"></script></body></html>

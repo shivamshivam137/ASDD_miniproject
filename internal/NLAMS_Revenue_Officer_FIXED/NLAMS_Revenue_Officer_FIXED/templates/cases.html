@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block title %}Land Acquisition Cases{% endblock %}{% block content %}
+<div class="toolbar"><div><h2>Assigned Cases</h2><p>Land acquisition cases requiring revenue verification.</p></div><div class="filters"><input id="search" placeholder="Search case, survey, village..." onkeyup="filterRows()"><select><option>All Status</option></select></div></div>
+<div class="panel"><table id="caseTable"><thead><tr><th>Case ID</th><th>Project</th><th>Location</th><th>Survey No.</th><th>Area</th><th>Owner</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>{% for c in cases %}<tr><td><b>{{c.case_id}}</b></td><td>{{c.project}}</td><td>{{c.village}}, {{c.taluka}}</td><td>{{c.survey_no}}</td><td>{{c.area}} ha</td><td>{{c.revenue_owner}}</td><td><span class="pill {{c.status|lower|replace(' ','-')}}">{{c.status}}</span></td><td><a class="smallbtn" href="{{url_for('case_detail',case_id=c.case_id)}}">Review</a></td></tr>{% endfor %}</tbody></table></div>
+<script>function filterRows(){let q=document.getElementById('search').value.toLowerCase();document.querySelectorAll('#caseTable tbody tr').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(q)?'':'none')}</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+
+{% extends "base.html" %}{% block content %}
+<div class="heading"><div><h1>My Projects</h1><p>Search, filter and monitor every project lifecycle stage.</p></div><a class="btn" href="/projects/new">＋ New Project</a></div>
+<div class="card"><form class="searchbar" method="get"><input class="input" name="q" value="{{q}}" placeholder="Search project ID, name, district or village..." style="max-width:440px"><select class="select" name="stage" style="max-width:220px"><option value="">All stages</option>{% for s in stages %}<option {% if selected_stage==s %}selected{% endif %}>{{s}}</option>{% endfor %}</select><button class="btn">Apply Filters</button><a class="btn secondary" href="/projects">Reset</a></form></div>
+<div class="card" style="margin-top:16px"><div class="table-wrap"><table class="table" id="projectsTable"><thead><tr><th>Project ID</th><th>Name</th><th>Department</th><th>Location</th><th>Land Required</th><th>Acquired</th><th>Stage</th><th>Progress</th><th>Risk</th><th>Action</th></tr></thead><tbody>
+{% for p in projects %}<tr><td><b>{{p.project_id}}</b></td><td>{{p.name}}</td><td>{{p.department}}</td><td>{{p.district}}, {{p.state}}</td><td>{{p.land_required}} Ha</td><td>{{p.land_acquired}} Ha</td><td><span class="badge blue">{{p.stage}}</span></td><td>{{p.progress}}%</td><td class="risk {% if p.risk>=70 %}high{% elif p.risk>=40 %}med{% else %}low{% endif %}">{{p.risk}}%</td><td><a class="btn secondary" href="/project/{{p.project_id}}">Open</a></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}
